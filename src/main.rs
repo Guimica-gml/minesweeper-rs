@@ -120,6 +120,16 @@ fn mine_make_cell_visible(
     }
 }
 
+fn mine_make_all_cells_visible(
+    mine_cells: &mut MineCells
+) {
+    for y in 0..GRID_HEIGHT {
+        for x in 0..GRID_WIDTH {
+            mine_make_cell_visible(mine_cells, x, y)
+        }
+    }
+}
+
 fn foreach_neighbor(
     x: usize,
     y: usize,
@@ -193,7 +203,12 @@ fn main() -> Result<(), String> {
                     let y = y as usize / FIELD_HEIGHT as usize;
 
                     if mouse_btn == MouseButton::Left {
-                        mine_make_cell_visible(&mut mine_cells, x, y);
+                        if let CellValue::Bomb = mine_cells[y][x].value {
+                            mine_make_all_cells_visible(&mut mine_cells);
+                        }
+                        else {
+                            mine_make_cell_visible(&mut mine_cells, x, y);
+                        }
                     }
                     else if mouse_btn == MouseButton::Right && !mine_cells[y][x].visible {
                         mine_cells[y][x].has_flag = !mine_cells[y][x].has_flag;
