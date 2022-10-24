@@ -123,7 +123,7 @@ fn mine_make_cell_visible(
 fn mine_make_all_cells_visible(mine_cells: &mut MineCells) {
     for y in 0..GRID_HEIGHT {
         for x in 0..GRID_WIDTH {
-            mine_make_cell_visible(mine_cells, x, y)
+            mine_make_cell_visible(mine_cells, x, y);
         }
     }
 }
