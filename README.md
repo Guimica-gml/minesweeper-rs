@@ -9,7 +9,7 @@ Minesweeper made in rust using sdl2.
 
 ## Quick start
 Make sure to setup sdl2 correctly if you don't have it already and to put sdl2 dlls in the root folder otherwise it won't work.
-If you have never done it you can check sdl2 [crate.io](https://crates.io/crates/sdl2) page.
+If you have never done it you can check sdl2 [crates.io](https://crates.io/crates/sdl2) page.
 If you have everything necessary you can just:
 
 ```Console
