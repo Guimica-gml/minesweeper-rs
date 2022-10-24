@@ -61,9 +61,9 @@ impl Display for Cell {
 
 type MineCells = [[Cell; GRID_WIDTH]; GRID_HEIGHT];
 
-fn create_mine_cells(bombs_amout: u32) -> MineCells {
+fn create_mine_cells(bombs_amount: u32) -> MineCells {
     assert!(
-        bombs_amout < (GRID_WIDTH * GRID_HEIGHT) as u32,
+        bombs_amount < (GRID_WIDTH * GRID_HEIGHT) as u32,
         "Amount of bombs should be less then the amount of cells"
     );
 
@@ -71,7 +71,7 @@ fn create_mine_cells(bombs_amout: u32) -> MineCells {
     let mut rand = rand::thread_rng();
     let mut bombs_placed = 0;
 
-    while bombs_placed < bombs_amout {
+    while bombs_placed < bombs_amount {
         let randx = rand.gen_range(0..GRID_WIDTH);
         let randy = rand.gen_range(0..GRID_HEIGHT);
 
