@@ -128,6 +128,16 @@ fn mine_make_all_cells_visible(mine_cells: &mut MineCells) {
     }
 }
 
+fn mine_toggle_flag_in_cell(
+    mine_cells: &mut MineCells,
+    x: usize,
+    y: usize,
+) {
+    if !mine_cells[y][x].visible {
+        mine_cells[y][x].has_flag = !mine_cells[y][x].has_flag;
+    }
+}
+
 fn foreach_neighbor(
     x: usize,
     y: usize,
@@ -208,8 +218,8 @@ fn main() -> Result<(), String> {
                             mine_make_cell_visible(&mut mine_cells, x, y);
                         }
                     }
-                    else if mouse_btn == MouseButton::Right && !mine_cells[y][x].visible {
-                        mine_cells[y][x].has_flag = !mine_cells[y][x].has_flag;
+                    else if mouse_btn == MouseButton::Right {
+                        mine_toggle_flag_in_cell(&mut mine_cells, x, y);
                     }
                 }
                 _ => {}
