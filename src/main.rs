@@ -1,6 +1,3 @@
-use std::fmt::Display;
-use rand::{self, Rng};
-
 use sdl2;
 use sdl2::ttf::Font;
 use sdl2::rect::Rect;
@@ -9,6 +6,7 @@ use sdl2::video::Window;
 use sdl2::pixels::Color;
 use sdl2::render::Canvas;
 use sdl2::mouse::MouseButton;
+use rand::{self, Rng};
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 800;
@@ -21,19 +19,16 @@ const FONT_SIZE: u16 = 32;
 const FIELD_WIDTH: u32 = WINDOW_WIDTH / GRID_WIDTH as u32;
 const FIELD_HEIGHT: u32 = WINDOW_HEIGHT / GRID_HEIGHT as u32;
 
+macro_rules! rect {
+    ($x: expr, $y: expr, $w: expr, $h: expr) => {
+        Rect::new($x as i32, $y as i32, $w as u32, $h as u32)
+    };
+}
+
 #[derive(Debug, Clone, Copy)]
 enum CellValue {
     Bomb,
     Num(i32),
-}
-
-impl Display for CellValue {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            CellValue::Bomb => write!(f, "Bomb!"),
-            CellValue::Num(num) => write!(f, "{}", num)
-        }
-    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -50,12 +45,6 @@ impl Cell {
             visible: false,
             has_flag: false,
         }
-    }
-}
-
-impl Display for Cell {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", self.value)
     }
 }
 
@@ -156,11 +145,11 @@ fn foreach_neighbor(
 fn draw_text(
     canvas: &mut Canvas<Window>,
     font: &Font,
-    text: String,
+    text: &str,
     pos: (i32, i32),
 ) -> Result<(), String> {
     let surface = font
-        .render(&text)
+        .render(text)
         .blended(Color::WHITE)
         .map_err(|e| e.to_string())?;
 
@@ -229,43 +218,50 @@ fn main() -> Result<(), String> {
         canvas.clear();
         canvas.set_draw_color(Color::WHITE);
 
-        // Draw horizontal lines
-        for y in 0..GRID_HEIGHT {
-            canvas.draw_line(
-                (0, (y + 1) as i32 * FIELD_HEIGHT as i32),
-                (WINDOW_WIDTH as i32, (y + 1) as i32 * FIELD_HEIGHT as i32)
-            )?;
-        }
-
-        // Draw vertical lines
-        for x in 0..GRID_WIDTH {
-            canvas.draw_line(
-                ((x + 1) as i32 * FIELD_WIDTH as i32, 0),
-                ((x + 1) as i32 * FIELD_WIDTH as i32, WINDOW_HEIGHT as i32)
-            )?;
-        }
-
         for y in 0..GRID_HEIGHT {
             for x in 0..GRID_WIDTH {
                 let posx = (x as u32 * FIELD_WIDTH + FIELD_WIDTH / 2) as i32;
                 let posy = (y as u32 * FIELD_HEIGHT + FIELD_HEIGHT / 2) as i32;
 
                 if mine_cells[y][x].has_flag {
-                    draw_text(
-                        &mut canvas,
-                        &font,
-                        "Flag!".to_string(),
-                        (posx, posy)
-                    )?;
+                    draw_text(&mut canvas, &font, "Flag!", (posx, posy))?;
                 }
                 else if mine_cells[y][x].visible {
-                    draw_text(
-                        &mut canvas,
-                        &font,
-                        mine_cells[y][x].to_string(),
-                        (posx, posy)
-                    )?;
+                    canvas.set_draw_color(Color::RGB(50, 50, 50));
+                    let background = rect!(
+                        posx - FIELD_WIDTH as i32 / 2,
+                        posy - FIELD_HEIGHT as i32 / 2,
+                        FIELD_WIDTH,
+                        FIELD_HEIGHT
+                    );
+                    canvas.fill_rect(background)?;
+                    canvas.set_draw_color(Color::WHITE);
+
+                    if let CellValue::Bomb = mine_cells[y][x].value {
+                        draw_text(&mut canvas, &font, "Bomb!", (posx, posy))?;
+                    }
+                    else if let CellValue::Num(num) = mine_cells[y][x].value {
+                        if num != 0 {
+                            draw_text(&mut canvas, &font, &num.to_string(), (posx, posy))?;
+                        }
+                    }
                 }
+            }
+
+            // Draw horizontal lines
+            for y in 0..GRID_HEIGHT {
+                canvas.draw_line(
+                    (0, (y + 1) as i32 * FIELD_HEIGHT as i32),
+                    (WINDOW_WIDTH as i32, (y + 1) as i32 * FIELD_HEIGHT as i32)
+                )?;
+            }
+
+            // Draw vertical lines
+            for x in 0..GRID_WIDTH {
+                canvas.draw_line(
+                    ((x + 1) as i32 * FIELD_WIDTH as i32, 0),
+                    ((x + 1) as i32 * FIELD_WIDTH as i32, WINDOW_HEIGHT as i32)
+                )?;
             }
         }
 
