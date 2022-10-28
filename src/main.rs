@@ -22,13 +22,13 @@ fn main() {
         }
     };
 
-    if mode == "-window" {
+    if mode == "--window" {
         match window::main() {
             Ok(_) => {},
             Err(err) => eprintln!("Error: {}", err),
         }
     }
-    else if mode == "-terminal" {
+    else if mode == "--terminal" {
         terminal::main();
     }
     else {
