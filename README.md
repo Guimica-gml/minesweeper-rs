@@ -1,7 +1,7 @@
 # minesweeper-rust
 Minesweeper made in rust using sdl2.
 
-![minesweeper](https://user-images.githubusercontent.com/66211581/197625808-77f58e3c-5692-42f9-acd3-f87474d76a7b.png)
+![minesweeper](https://user-images.githubusercontent.com/66211581/197833208-aaa3ea82-42e0-4d92-9f27-e8de74ea7c56.png)
 
 ## Commands
 - right click: reveals the clicked cell
