@@ -118,13 +118,10 @@ fn main() -> Result<(), String> {
                     canvas.fill_rect(background)?;
                     canvas.set_draw_color(Color::WHITE);
 
-                    if let CellValue::Bomb = minesweeper.get_cell(x, y).value() {
-                        draw_text(&mut canvas, &font, "Bomb!", (posx, posy))?;
-                    }
-                    else if let CellValue::Num(num) = minesweeper.get_cell(x, y).value() {
-                        if *num != 0 {
-                            draw_text(&mut canvas, &font, &num.to_string(), (posx, posy))?;
-                        }
+                    match minesweeper.get_cell(x, y).value() {
+                        CellValue::Bomb => draw_text(&mut canvas, &font, "Bomb!", (posx, posy))?,
+                        CellValue::Num(num) if *num != 0 => draw_text(&mut canvas, &font, &num.to_string(), (posx, posy))?,
+                        _ => {}
                     }
                 }
             }
