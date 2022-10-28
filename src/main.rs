@@ -77,7 +77,7 @@ fn create_mine_cells(bombs_amount: u32) -> MineCells {
             }
 
             let mut bomb_neighbours = 0;
-            foreach_neighbor(x, y, &mut |nx, ny| {
+            foreach_neighbor(x, y, |nx, ny| {
                 if let CellValue::Bomb = cells[ny][nx].value {
                     bomb_neighbours += 1;
                 }
@@ -130,7 +130,7 @@ fn mine_toggle_flag_in_cell(
 fn foreach_neighbor(
     x: usize,
     y: usize,
-    func: &mut dyn FnMut(usize, usize) -> (),
+    mut func: impl FnMut(usize, usize) -> (),
 ) {
     if x > 0 { func(x - 1, y); }
     if y > 0 { func(x, y - 1); }
