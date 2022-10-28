@@ -10,14 +10,7 @@ use rand::{self, Rng};
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 800;
-
-const GRID_WIDTH: usize = 8;
-const GRID_HEIGHT: usize = 8;
-const BOMBS_AMOUNT: u32 = 10;
 const FONT_SIZE: u16 = 32;
-
-const FIELD_WIDTH: u32 = WINDOW_WIDTH / GRID_WIDTH as u32;
-const FIELD_HEIGHT: u32 = WINDOW_HEIGHT / GRID_HEIGHT as u32;
 
 macro_rules! rect {
     ($x: expr, $y: expr, $w: expr, $h: expr) => {
@@ -48,21 +41,31 @@ impl Cell {
     }
 }
 
-type MineCells = [[Cell; GRID_WIDTH]; GRID_HEIGHT];
+struct Minesweeper {
+    width: usize,
+    height: usize,
+    cells: Vec<Vec<Cell>>,
+}
 
-fn create_mine_cells(bombs_amount: u32) -> MineCells {
+fn create_mine_cells(width: usize, height: usize, bombs_amount: u32) -> Minesweeper {
     assert!(
-        bombs_amount < (GRID_WIDTH * GRID_HEIGHT) as u32,
+        bombs_amount < (width * height) as u32,
         "Amount of bombs should be less then the amount of cells"
     );
 
-    let mut cells = [[Cell::new(0); GRID_WIDTH]; GRID_HEIGHT];
+    let mut minesweeper = Minesweeper {
+        width,
+        height,
+        cells: vec![vec![Cell::new(0); width]; height],
+    };
+
+    let cells = &mut minesweeper.cells;
     let mut rand = rand::thread_rng();
     let mut bombs_placed = 0;
 
     while bombs_placed < bombs_amount {
-        let randx = rand.gen_range(0..GRID_WIDTH);
-        let randy = rand.gen_range(0..GRID_HEIGHT);
+        let randx = rand.gen_range(0..width);
+        let randy = rand.gen_range(0..height);
 
         if let CellValue::Num(_) = cells[randy][randx].value {
             cells[randy][randx].value = CellValue::Bomb;
@@ -70,14 +73,14 @@ fn create_mine_cells(bombs_amount: u32) -> MineCells {
         }
     }
 
-    for y in 0..GRID_HEIGHT {
-        for x in 0..GRID_WIDTH {
+    for y in 0..height {
+        for x in 0..width {
             if let CellValue::Bomb = cells[y][x].value {
                 continue;
             }
 
             let mut bomb_neighbours = 0;
-            foreach_neighbor(x, y, |nx, ny| {
+            foreach_neighbor(x, y, minesweeper.width, minesweeper.height, |nx, ny| {
                 if let CellValue::Bomb = cells[ny][nx].value {
                     bomb_neighbours += 1;
                 }
@@ -87,59 +90,59 @@ fn create_mine_cells(bombs_amount: u32) -> MineCells {
         }
     }
 
-    cells
+    minesweeper
 }
 
 fn mine_make_cell_visible(
-    mine_cells: &mut MineCells,
+    minesweeper: &mut Minesweeper,
     x: usize,
     y: usize,
 ) {
-    if mine_cells[y][x].visible {
+    if minesweeper.cells[y][x].visible {
         return;
     }
 
-    mine_cells[y][x].visible = true;
-    mine_cells[y][x].has_flag = false;
+    minesweeper.cells[y][x].visible = true;
+    minesweeper.cells[y][x].has_flag = false;
 
-    if let CellValue::Num(0) = mine_cells[y][x].value {
-        foreach_neighbor(x, y, &mut |nx, ny| {
-            mine_make_cell_visible(mine_cells, nx, ny);
+    if let CellValue::Num(0) = minesweeper.cells[y][x].value {
+        foreach_neighbor(x, y, minesweeper.width, minesweeper.height, |nx, ny| {
+            mine_make_cell_visible(minesweeper, nx, ny);
         });
     }
 }
 
-fn mine_make_all_cells_visible(mine_cells: &mut MineCells) {
-    for y in 0..GRID_HEIGHT {
-        for x in 0..GRID_WIDTH {
-            mine_make_cell_visible(mine_cells, x, y);
+fn mine_make_all_cells_visible(minesweeper: &mut Minesweeper) {
+    for y in 0..minesweeper.height {
+        for x in 0..minesweeper.width {
+            mine_make_cell_visible(minesweeper, x, y);
         }
     }
 }
 
 fn mine_toggle_flag_in_cell(
-    mine_cells: &mut MineCells,
+    minesweeper: &mut Minesweeper,
     x: usize,
     y: usize,
 ) {
-    if !mine_cells[y][x].visible {
-        mine_cells[y][x].has_flag = !mine_cells[y][x].has_flag;
+    if !minesweeper.cells[y][x].visible {
+        minesweeper.cells[y][x].has_flag = !minesweeper.cells[y][x].has_flag;
     }
 }
 
 fn foreach_neighbor(
-    x: usize,
-    y: usize,
+    x: usize, y: usize,
+    w: usize, h: usize,
     mut func: impl FnMut(usize, usize) -> (),
 ) {
     if x > 0 { func(x - 1, y); }
     if y > 0 { func(x, y - 1); }
-    if x < GRID_WIDTH - 1 { func(x + 1, y); }
-    if y < GRID_HEIGHT - 1 { func(x, y + 1); }
-    if y < GRID_HEIGHT - 1 && x > 0 { func(x - 1, y + 1); }
-    if y > 0 && x < GRID_WIDTH - 1 { func(x + 1, y - 1); }
+    if x < w - 1 { func(x + 1, y); }
+    if y < h - 1 { func(x, y + 1); }
+    if y < h - 1 && x > 0 { func(x - 1, y + 1); }
+    if y > 0 && x < w - 1 { func(x + 1, y - 1); }
     if y > 0 && x > 0 { func(x - 1, y - 1); }
-    if y < GRID_HEIGHT - 1 && x < GRID_WIDTH - 1 { func(x + 1, y + 1); }
+    if y < h - 1 && x < w - 1 { func(x + 1, y + 1); }
 }
 
 fn draw_text(
@@ -189,26 +192,29 @@ fn main() -> Result<(), String> {
     let font = ttf_context.load_font("font/Iosevka.ttf", FONT_SIZE)?;
 
     let mut event_pump = sdl_context.event_pump()?;
-    let mut mine_cells = create_mine_cells(BOMBS_AMOUNT);
+    let mut minesweeper = create_mine_cells(8, 8, 10);
+
+    let field_width: u32 = WINDOW_WIDTH / minesweeper.width as u32;
+    let field_height: u32 = WINDOW_HEIGHT / minesweeper.height as u32;
 
     'gameloop: loop {
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit { .. } => break 'gameloop,
                 Event::MouseButtonDown { mouse_btn, x, y, .. } => {
-                    let x = x as usize / FIELD_WIDTH as usize;
-                    let y = y as usize / FIELD_HEIGHT as usize;
+                    let x = x as usize / field_width as usize;
+                    let y = y as usize / field_height as usize;
 
                     if mouse_btn == MouseButton::Left {
-                        if let CellValue::Bomb = mine_cells[y][x].value {
-                            mine_make_all_cells_visible(&mut mine_cells);
+                        if let CellValue::Bomb = minesweeper.cells[y][x].value {
+                            mine_make_all_cells_visible(&mut minesweeper);
                         }
                         else {
-                            mine_make_cell_visible(&mut mine_cells, x, y);
+                            mine_make_cell_visible(&mut minesweeper, x, y);
                         }
                     }
                     else if mouse_btn == MouseButton::Right {
-                        mine_toggle_flag_in_cell(&mut mine_cells, x, y);
+                        mine_toggle_flag_in_cell(&mut minesweeper, x, y);
                     }
                 }
                 _ => {}
@@ -218,29 +224,29 @@ fn main() -> Result<(), String> {
         canvas.clear();
         canvas.set_draw_color(Color::WHITE);
 
-        for y in 0..GRID_HEIGHT {
-            for x in 0..GRID_WIDTH {
-                let posx = (x as u32 * FIELD_WIDTH + FIELD_WIDTH / 2) as i32;
-                let posy = (y as u32 * FIELD_HEIGHT + FIELD_HEIGHT / 2) as i32;
+        for y in 0..minesweeper.height {
+            for x in 0..minesweeper.width {
+                let posx = (x as u32 * field_width + field_width / 2) as i32;
+                let posy = (y as u32 * field_height + field_height / 2) as i32;
 
-                if mine_cells[y][x].has_flag {
+                if minesweeper.cells[y][x].has_flag {
                     draw_text(&mut canvas, &font, "Flag!", (posx, posy))?;
                 }
-                else if mine_cells[y][x].visible {
+                else if minesweeper.cells[y][x].visible {
                     canvas.set_draw_color(Color::RGB(50, 50, 50));
                     let background = rect!(
-                        posx - FIELD_WIDTH as i32 / 2,
-                        posy - FIELD_HEIGHT as i32 / 2,
-                        FIELD_WIDTH,
-                        FIELD_HEIGHT
+                        posx - field_width as i32 / 2,
+                        posy - field_height as i32 / 2,
+                        field_width,
+                        field_height
                     );
                     canvas.fill_rect(background)?;
                     canvas.set_draw_color(Color::WHITE);
 
-                    if let CellValue::Bomb = mine_cells[y][x].value {
+                    if let CellValue::Bomb = minesweeper.cells[y][x].value {
                         draw_text(&mut canvas, &font, "Bomb!", (posx, posy))?;
                     }
-                    else if let CellValue::Num(num) = mine_cells[y][x].value {
+                    else if let CellValue::Num(num) = minesweeper.cells[y][x].value {
                         if num != 0 {
                             draw_text(&mut canvas, &font, &num.to_string(), (posx, posy))?;
                         }
@@ -249,18 +255,18 @@ fn main() -> Result<(), String> {
             }
 
             // Draw horizontal lines
-            for y in 0..GRID_HEIGHT {
+            for y in 0..minesweeper.height {
                 canvas.draw_line(
-                    (0, (y + 1) as i32 * FIELD_HEIGHT as i32),
-                    (WINDOW_WIDTH as i32, (y + 1) as i32 * FIELD_HEIGHT as i32)
+                    (0, (y + 1) as i32 * field_height as i32),
+                    (WINDOW_WIDTH as i32, (y + 1) as i32 * field_height as i32)
                 )?;
             }
 
             // Draw vertical lines
-            for x in 0..GRID_WIDTH {
+            for x in 0..minesweeper.width {
                 canvas.draw_line(
-                    ((x + 1) as i32 * FIELD_WIDTH as i32, 0),
-                    ((x + 1) as i32 * FIELD_WIDTH as i32, WINDOW_HEIGHT as i32)
+                    ((x + 1) as i32 * field_width as i32, 0),
+                    ((x + 1) as i32 * field_width as i32, WINDOW_HEIGHT as i32)
                 )?;
             }
         }
