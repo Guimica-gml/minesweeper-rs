@@ -40,7 +40,7 @@ impl Minesweeper {
     pub fn new(width: usize, height: usize, bombs_amount: u32) -> Minesweeper {
         assert!(
             bombs_amount < (width * height) as u32,
-            "Amount of bombs should be less then the amount of cells"
+            "Amount of bombs should be less than the amount of cells"
         );
 
         let mut minesweeper = Minesweeper {
