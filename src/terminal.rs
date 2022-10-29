@@ -82,7 +82,7 @@ pub fn main() -> Result<()> {
                     minesweeper.make_cell_visible(cursor_x, cursor_y);
                 }
             }
-            Event::Key(KeyEvent { code: KeyCode::Backspace, .. }) => {
+            Event::Key(KeyEvent { code: KeyCode::Char(' '), .. }) => {
                 minesweeper.toggle_flag_in_cell(cursor_x, cursor_y);
             }
             _ => {}
