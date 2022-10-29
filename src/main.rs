@@ -12,7 +12,7 @@ fn usage() {
     eprintln!("    terminal: Runs the game in a terminal");
 }
 
-fn main() {
+fn main() -> Result<(), String> {
     let mut args = env::args().skip(1);
     let mode = match args.next() {
         Some(v) => v,
@@ -23,16 +23,15 @@ fn main() {
     };
 
     if mode == "--window" {
-        match window::main() {
-            Ok(_) => {},
-            Err(err) => eprintln!("Error: {}", err),
-        }
+        window::main()?;
     }
     else if mode == "--terminal" {
-        terminal::main();
+        terminal::main().map_err(|e| e.to_string())?;
     }
     else {
         eprintln!("Error: invalid execution mode");
         usage();
     }
+
+    Ok(())
 }
