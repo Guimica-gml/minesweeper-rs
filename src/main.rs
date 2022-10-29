@@ -18,7 +18,8 @@ fn main() -> Result<(), String> {
         Some(v) => v,
         None => {
             eprintln!("Error: Expected execution mode argument");
-            process::exit(1);
+            usage();
+            process::exit(0);
         }
     };
 
