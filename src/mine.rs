@@ -87,11 +87,7 @@ impl Minesweeper {
         return &self.cells[y][x];
     }
 
-    pub fn make_cell_visible(
-        &mut self,
-        x: usize,
-        y: usize,
-    ) {
+    pub fn make_cell_visible(&mut self, x: usize, y: usize) {
         if self.cells[y][x].visible {
             return;
         }
@@ -114,22 +110,14 @@ impl Minesweeper {
         }
     }
 
-    pub fn toggle_flag_in_cell(
-        &mut self,
-        x: usize,
-        y: usize,
-    ) {
+    pub fn toggle_flag_in_cell(&mut self, x: usize, y: usize) {
         if !self.cells[y][x].visible {
             self.cells[y][x].has_flag = !self.cells[y][x].has_flag;
         }
     }
 }
 
-fn foreach_neighbor(
-    x: usize, y: usize,
-    w: usize, h: usize,
-    mut func: impl FnMut(usize, usize) -> (),
-) {
+fn foreach_neighbor(x: usize, y: usize, w: usize, h: usize, mut func: impl FnMut(usize, usize)) {
     if x > 0 { func(x - 1, y); }
     if y > 0 { func(x, y - 1); }
     if x < w - 1 { func(x + 1, y); }
