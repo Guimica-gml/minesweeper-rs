@@ -58,7 +58,7 @@ pub fn main() -> Result<()> {
                     style::Print(char),
                 )?;
             }
-            print!("\n");
+            print!("\r\n");
         }
 
         execute!(
