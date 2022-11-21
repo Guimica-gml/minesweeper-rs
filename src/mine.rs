@@ -37,19 +37,13 @@ impl Minesweeper {
     pub fn width(&self) -> usize { self.width }
     pub fn height(&self) -> usize { self.height }
 
-    pub fn new(width: usize, height: usize, bombs_amount: u32) -> Minesweeper {
+    pub fn new(width: usize, height: usize, bombs_amount: u32) -> Self {
         assert!(
             bombs_amount < (width * height) as u32,
             "Amount of bombs should be less than the amount of cells"
         );
 
-        let mut minesweeper = Minesweeper {
-            width,
-            height,
-            cells: vec![vec![Cell::new(0); width]; height],
-        };
-
-        let cells = &mut minesweeper.cells;
+        let mut cells = vec![vec![Cell::new(0); width]; height];
         let mut rand = rand::thread_rng();
         let mut bombs_placed = 0;
 
@@ -70,7 +64,7 @@ impl Minesweeper {
                 }
 
                 let mut bomb_neighbours = 0;
-                foreach_neighbor(x, y, minesweeper.width, minesweeper.height, |nx, ny| {
+                foreach_neighbor(x, y, width, height, |nx, ny| {
                     if let CellValue::Bomb = cells[ny][nx].value {
                         bomb_neighbours += 1;
                     }
@@ -80,7 +74,7 @@ impl Minesweeper {
             }
         }
 
-        minesweeper
+        Self { width, height, cells }
     }
 
     pub fn get_cell(&self, x: usize, y: usize) -> &Cell {
