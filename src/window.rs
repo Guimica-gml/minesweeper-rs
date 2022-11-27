@@ -2,9 +2,9 @@ use sdl2;
 use sdl2::ttf::Font;
 use sdl2::rect::Rect;
 use sdl2::event::Event;
-use sdl2::video::Window;
+use sdl2::video::{Window, WindowContext};
 use sdl2::pixels::Color;
-use sdl2::render::Canvas;
+use sdl2::render::{Canvas, TextureCreator};
 use sdl2::mouse::MouseButton;
 
 use super::mine::*;
@@ -21,6 +21,7 @@ macro_rules! rect {
 
 fn draw_text(
     canvas: &mut Canvas<Window>,
+    texture_creator: &TextureCreator<WindowContext>,
     font: &Font,
     text: &str,
     pos: (i32, i32),
@@ -30,7 +31,6 @@ fn draw_text(
         .blended(Color::WHITE)
         .map_err(|e| e.to_string())?;
 
-    let texture_creator = canvas.texture_creator();
     let texture = texture_creator
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())?;
@@ -65,6 +65,7 @@ pub fn main() -> Result<(), String> {
 
     let font = ttf_context.load_font("font/Iosevka.ttf", FONT_SIZE)?;
 
+    let texture_creator = canvas.texture_creator();
     let mut event_pump = sdl_context.event_pump()?;
     let mut minesweeper = Minesweeper::new(8, 8, 10);
 
@@ -104,7 +105,7 @@ pub fn main() -> Result<(), String> {
                 let posy = (y as u32 * field_height + field_height / 2) as i32;
 
                 if minesweeper.get_cell(x, y).has_flag() {
-                    draw_text(&mut canvas, &font, "Flag!", (posx, posy))?;
+                    draw_text(&mut canvas, &texture_creator, &font, "Flag!", (posx, posy))?;
                 }
                 else if minesweeper.get_cell(x, y).visible() {
                     canvas.set_draw_color(Color::RGB(50, 50, 50));
@@ -118,8 +119,8 @@ pub fn main() -> Result<(), String> {
                     canvas.set_draw_color(Color::WHITE);
 
                     match minesweeper.get_cell(x, y).value() {
-                        CellValue::Bomb => draw_text(&mut canvas, &font, "Bomb!", (posx, posy))?,
-                        CellValue::Num(num) if *num != 0 => draw_text(&mut canvas, &font, &num.to_string(), (posx, posy))?,
+                        CellValue::Bomb => draw_text(&mut canvas, &texture_creator, &font, "Bomb!", (posx, posy))?,
+                        CellValue::Num(num) if *num != 0 => draw_text(&mut canvas, &texture_creator, &font, &num.to_string(), (posx, posy))?,
                         _ => {}
                     }
                 }
