@@ -12,7 +12,6 @@ use super::mine::*;
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 800;
-const FONT_SIZE: u16 = 32;
 
 macro_rules! rect {
     ($x: expr, $y: expr, $w: expr, $h: expr) => {
@@ -66,17 +65,18 @@ pub fn main() -> Result<(), String> {
         .build()
         .map_err(|e| e.to_string())?;
 
-    let font = ttf_context.load_font("./font/Iosevka.ttf", FONT_SIZE)?;
-    let texture_creator = canvas.texture_creator();
-
-    let flag_texture = texture_creator.load_texture("./img/flag.png")?;
-    let bomb_texture = texture_creator.load_texture("./img/bomb.png")?;
-
     let mut event_pump = sdl_context.event_pump()?;
     let mut minesweeper = Minesweeper::new(8, 8, 10);
 
     let field_width: u32 = WINDOW_WIDTH / minesweeper.width() as u32;
     let field_height: u32 = WINDOW_HEIGHT / minesweeper.height() as u32;
+
+    let font_size = (u32::min(field_height, field_width) as f32 * 0.4) as u16;
+    let font = ttf_context.load_font("./font/Iosevka.ttf", font_size)?;
+    let texture_creator = canvas.texture_creator();
+
+    let flag_texture = texture_creator.load_texture("./img/flag.png")?;
+    let bomb_texture = texture_creator.load_texture("./img/bomb.png")?;
 
     'gameloop: loop {
         for event in event_pump.poll_iter() {
