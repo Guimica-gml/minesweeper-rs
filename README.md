@@ -1,4 +1,4 @@
-# minesweeper-rust
+# minesweeper-rs
 Minesweeper made in rust that can be played in a window or terminal.
 
 ![minesweeper](https://user-images.githubusercontent.com/66211581/208497587-1f415cff-2ced-476f-943d-833feb8aacb1.png)
