@@ -1,5 +1,6 @@
 use sdl2;
-use sdl2::ttf::Font;
+use sdl2::image::{self, InitFlag, LoadTexture};
+use sdl2::ttf::{self, Font};
 use sdl2::rect::Rect;
 use sdl2::event::Event;
 use sdl2::video::{Window, WindowContext};
@@ -48,8 +49,10 @@ fn draw_text(
 
 pub fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
+    let ttf_context = ttf::init().map_err(|e| e.to_string())?;
+    let _ = image::init(InitFlag::PNG)?;
+
     let video_subsystem = sdl_context.video()?;
-    let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string())?;
 
     let window = video_subsystem
         .window("Minesweeper", WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -63,9 +66,12 @@ pub fn main() -> Result<(), String> {
         .build()
         .map_err(|e| e.to_string())?;
 
-    let font = ttf_context.load_font("font/Iosevka.ttf", FONT_SIZE)?;
-
+    let font = ttf_context.load_font("./font/Iosevka.ttf", FONT_SIZE)?;
     let texture_creator = canvas.texture_creator();
+
+    let flag_texture = texture_creator.load_texture("./img/flag.png")?;
+    let bomb_texture = texture_creator.load_texture("./img/bomb.png")?;
+
     let mut event_pump = sdl_context.event_pump()?;
     let mut minesweeper = Minesweeper::new(8, 8, 10);
 
@@ -105,7 +111,9 @@ pub fn main() -> Result<(), String> {
                 let posy = (y as u32 * field_height + field_height / 2) as i32;
 
                 if minesweeper.get_cell(x, y).has_flag() {
-                    draw_text(&mut canvas, &texture_creator, &font, "Flag!", (posx, posy))?;
+                    let img_size = (u32::min(field_height, field_width) as f32 * 0.7) as i32;
+                    let target = rect!(posx - img_size / 2, posy - img_size / 2, img_size, img_size);
+                    canvas.copy(&flag_texture, None, Some(target))?;
                 }
                 else if minesweeper.get_cell(x, y).visible() {
                     canvas.set_draw_color(Color::RGB(50, 50, 50));
@@ -119,7 +127,11 @@ pub fn main() -> Result<(), String> {
                     canvas.set_draw_color(Color::WHITE);
 
                     match minesweeper.get_cell(x, y).value() {
-                        CellValue::Bomb => draw_text(&mut canvas, &texture_creator, &font, "Bomb!", (posx, posy))?,
+                        CellValue::Bomb => {
+                            let img_size = (u32::min(field_height, field_width) as f32 * 0.7) as i32;
+                            let target = rect!(posx - img_size / 2, posy - img_size / 2, img_size, img_size);
+                            canvas.copy(&bomb_texture, None, Some(target))?;
+                        }
                         CellValue::Num(num) if *num != 0 => draw_text(&mut canvas, &texture_creator, &font, &num.to_string(), (posx, posy))?,
                         _ => {}
                     }
