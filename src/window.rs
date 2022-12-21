@@ -1,5 +1,6 @@
 use sdl2;
 use sdl2::image::{self, InitFlag, LoadTexture};
+use sdl2::rwops::RWops;
 use sdl2::ttf::{self, Font};
 use sdl2::rect::Rect;
 use sdl2::event::Event;
@@ -12,6 +13,10 @@ use super::mine::*;
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 800;
+
+const FONT_TTF_BYTES: &[u8] = include_bytes!("../font/Iosevka.ttf");
+const FLAG_PNG_BYTES: &[u8] = include_bytes!("../img/flag.png");
+const BOMB_PNG_BYTES: &[u8] = include_bytes!("../img/bomb.png");
 
 macro_rules! rect {
     ($x: expr, $y: expr, $w: expr, $h: expr) => {
@@ -72,11 +77,11 @@ pub fn main() -> Result<(), String> {
     let field_height: u32 = WINDOW_HEIGHT / minesweeper.height() as u32;
 
     let font_size = (u32::min(field_height, field_width) as f32 * 0.4) as u16;
-    let font = ttf_context.load_font("./font/Iosevka.ttf", font_size)?;
+    let font = ttf_context.load_font_from_rwops(RWops::from_bytes(FONT_TTF_BYTES)?, font_size)?;
     let texture_creator = canvas.texture_creator();
 
-    let flag_texture = texture_creator.load_texture("./img/flag.png")?;
-    let bomb_texture = texture_creator.load_texture("./img/bomb.png")?;
+    let flag_texture = texture_creator.load_texture_bytes(FLAG_PNG_BYTES)?;
+    let bomb_texture = texture_creator.load_texture_bytes(BOMB_PNG_BYTES)?;
 
     'gameloop: loop {
         for event in event_pump.poll_iter() {
