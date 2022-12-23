@@ -3,7 +3,7 @@ Minesweeper made in rust that can be played in a window or terminal.
 
 ![minesweeper](https://user-images.githubusercontent.com/66211581/208497587-1f415cff-2ced-476f-943d-833feb8aacb1.png)
 
-![minesweeper terminal](https://user-images.githubusercontent.com/66211581/198754308-51328e6a-36cb-4f91-b4dc-3390c4070843.png)
+![minewsweeper-terminal](https://user-images.githubusercontent.com/66211581/209406530-f58bb59d-d263-4f1d-a501-a4e348be9569.png)
 
 ## Commands
 ### Window:
