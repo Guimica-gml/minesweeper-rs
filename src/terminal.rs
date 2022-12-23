@@ -25,7 +25,7 @@ pub fn main() -> Result<()> {
 
         for y in 0..minesweeper.height() {
             for x in 0..minesweeper.width() {
-                let fg_color: Color;
+                let mut fg_color: Color;
                 let bg_color: Color;
                 let char: char;
 
@@ -39,12 +39,19 @@ pub fn main() -> Result<()> {
                 }
 
                 if minesweeper.get_cell(x, y).has_flag() {
+                    fg_color = Color::DarkBlue;
                     char = 'F';
                 }
                 else if minesweeper.get_cell(x, y).visible() {
                     char = match minesweeper.get_cell(x, y).value() {
-                        CellValue::Bomb => 'B',
-                        CellValue::Num(num) => num.to_string().chars().nth(0).unwrap(),
+                        CellValue::Bomb => {
+                            fg_color = Color::Red;
+                            'B'
+                        }
+                        CellValue::Num(num) => {
+                            fg_color = Color::Grey;
+                            num.to_string().chars().nth(0).unwrap()
+                        }
                     };
                 }
                 else {
