@@ -49,7 +49,7 @@ pub fn main() -> Result<()> {
                             'B'
                         }
                         CellValue::Num(num) => {
-                            fg_color = Color::Grey;
+                            fg_color = Color::DarkGrey;
                             num.to_string().chars().nth(0).unwrap()
                         }
                     };
