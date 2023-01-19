@@ -19,7 +19,7 @@ fn main() -> Result<(), String> {
         None => {
             eprintln!("Error: Expected execution mode argument");
             usage();
-            process::exit(0);
+            process::exit(1);
         }
     };
 
@@ -32,6 +32,7 @@ fn main() -> Result<(), String> {
     else {
         eprintln!("Error: invalid execution mode");
         usage();
+        process::exit(1);
     }
 
     Ok(())
