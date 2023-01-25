@@ -9,10 +9,12 @@ Minesweeper made in rust that can be played in a window or terminal.
 ### Window:
 - right click: reveals the clicked cell
 - left click: put a flag on top of the clicked cell
+- R: resets the board
 ### Terminal:
 - enter: reveals cell with the cursor
 - spacebar: put a flag on top of the cell with the cursor
 - arrow keys: move the cursor
+- R: resets the board
 
 ## Quick start
 Make sure to setup sdl2 correctly if you don't have it already and to put sdl2 dlls in the root folder otherwise it won't work.
