@@ -1,12 +1,12 @@
 use rand::{self, Rng};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum CellValue {
     Bomb,
     Num(i32),
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Cell {
     value: CellValue,
     visible: bool,
