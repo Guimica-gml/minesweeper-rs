@@ -7,9 +7,13 @@ use crossterm::event::{read, Event, KeyCode, KeyEvent, KeyModifiers};
 
 use super::mine::*;
 
+const MINE_WIDTH: usize = 12;
+const MINE_HEIGHT: usize = 5;
+const MINE_BOMBS_AMOUNT: u32 = 10;
+
 pub fn main() -> Result<()> {
     enable_raw_mode()?;
-    let mut minesweeper = Minesweeper::new(12, 5, 10);
+    let mut minesweeper = Minesweeper::new(MINE_WIDTH, MINE_HEIGHT, MINE_BOMBS_AMOUNT);
 
     let mut cursor_x: usize = 0;
     let mut cursor_y: usize = 0;
@@ -81,6 +85,9 @@ pub fn main() -> Result<()> {
             Event::Key(KeyEvent { code: KeyCode::Right, .. }) if cursor_x < minesweeper.width() - 1 => cursor_x += 1,
             Event::Key(KeyEvent { code: KeyCode::Up, .. }) if cursor_y > 0 => cursor_y -= 1,
             Event::Key(KeyEvent { code: KeyCode::Down, .. }) if cursor_y < minesweeper.height() - 1 => cursor_y += 1,
+            Event::Key(KeyEvent { code: KeyCode::Char('r'), .. }) => {
+                minesweeper = Minesweeper::new(MINE_WIDTH, MINE_HEIGHT, MINE_BOMBS_AMOUNT);
+            }
             Event::Key(KeyEvent { code: KeyCode::Enter, .. }) => {
                 if let CellValue::Bomb = minesweeper.get_cell(cursor_x, cursor_y).value() {
                     minesweeper.make_all_cells_visible();

@@ -1,5 +1,6 @@
 use sdl2;
 use sdl2::image::{self, InitFlag, LoadTexture};
+use sdl2::keyboard::Keycode;
 use sdl2::rwops::RWops;
 use sdl2::ttf::{self, Font};
 use sdl2::rect::Rect;
@@ -13,6 +14,10 @@ use super::mine::*;
 
 const WINDOW_WIDTH: u32 = 800;
 const WINDOW_HEIGHT: u32 = 800;
+
+const MINE_WIDTH: usize = 8;
+const MINE_HEIGHT: usize = 8;
+const MINE_BOMBS_AMOUNT: u32 = 10;
 
 const FONT_TTF_BYTES: &[u8] = include_bytes!("../font/Iosevka.ttf");
 const FLAG_PNG_BYTES: &[u8] = include_bytes!("../img/flag.png");
@@ -71,7 +76,7 @@ pub fn main() -> Result<(), String> {
         .map_err(|e| e.to_string())?;
 
     let mut event_pump = sdl_context.event_pump()?;
-    let mut minesweeper = Minesweeper::new(8, 8, 10);
+    let mut minesweeper = Minesweeper::new(MINE_WIDTH, MINE_HEIGHT, MINE_BOMBS_AMOUNT);
 
     let field_width: u32 = WINDOW_WIDTH / minesweeper.width() as u32;
     let field_height: u32 = WINDOW_HEIGHT / minesweeper.height() as u32;
@@ -87,6 +92,9 @@ pub fn main() -> Result<(), String> {
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit { .. } => break 'gameloop,
+                Event::KeyDown { keycode: Some(Keycode::R), .. } => {
+                    minesweeper = Minesweeper::new(MINE_WIDTH, MINE_HEIGHT, MINE_BOMBS_AMOUNT);
+                }
                 Event::MouseButtonDown { mouse_btn, x, y, .. } => {
                     let x = x as usize / field_width as usize;
                     let y = y as usize / field_height as usize;
@@ -137,7 +145,9 @@ pub fn main() -> Result<(), String> {
                             let target = rect!(posx - img_size / 2, posy - img_size / 2, img_size, img_size);
                             canvas.copy(&bomb_texture, None, Some(target))?;
                         }
-                        CellValue::Num(num) if *num != 0 => draw_text(&mut canvas, &texture_creator, &font, &num.to_string(), (posx, posy))?,
+                        CellValue::Num(num) if *num != 0 => {
+                            draw_text(&mut canvas, &texture_creator, &font, &num.to_string(), (posx, posy))?;
+                        }
                         _ => {}
                     }
                 }
