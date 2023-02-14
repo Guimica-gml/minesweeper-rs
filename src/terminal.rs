@@ -90,7 +90,7 @@ pub fn main() -> Result<()> {
             }
             Event::Key(KeyEvent { code: KeyCode::Enter, .. }) => {
                 if let CellValue::Bomb = minesweeper.get_cell(cursor_x, cursor_y).value() {
-                    minesweeper.make_all_cells_visible();
+                    minesweeper.make_bombs_visible();
                 }
                 else {
                     minesweeper.make_cell_visible(cursor_x, cursor_y);

@@ -101,7 +101,7 @@ pub fn main() -> Result<(), String> {
 
                     if mouse_btn == MouseButton::Left {
                         if let CellValue::Bomb = minesweeper.get_cell(x, y).value() {
-                            minesweeper.make_all_cells_visible();
+                            minesweeper.make_bombs_visible();
                         }
                         else {
                             minesweeper.make_cell_visible(x, y);

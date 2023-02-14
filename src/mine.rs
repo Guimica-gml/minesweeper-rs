@@ -96,10 +96,12 @@ impl Minesweeper {
         }
     }
 
-    pub fn make_all_cells_visible(&mut self) {
+    pub fn make_bombs_visible(&mut self) {
         for y in 0..self.height {
             for x in 0..self.width {
-                self.make_cell_visible(x, y);
+                if let CellValue::Bomb = self.cells[y][x].value {
+                    self.make_cell_visible(x, y);
+                }
             }
         }
     }
