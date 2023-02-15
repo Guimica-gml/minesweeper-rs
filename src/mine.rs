@@ -37,6 +37,10 @@ impl Minesweeper {
     pub fn width(&self) -> usize { self.width }
     pub fn height(&self) -> usize { self.height }
 
+    pub fn get_cell(&self, x: usize, y: usize) -> &Cell {
+        &self.cells[y][x]
+    }
+
     pub fn new(width: usize, height: usize, bombs_amount: u32) -> Self {
         assert!(
             bombs_amount < (width * height) as u32,
@@ -75,10 +79,6 @@ impl Minesweeper {
         }
 
         Self { width, height, cells }
-    }
-
-    pub fn get_cell(&self, x: usize, y: usize) -> &Cell {
-        return &self.cells[y][x];
     }
 
     pub fn make_cell_visible(&mut self, x: usize, y: usize) {
