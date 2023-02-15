@@ -63,14 +63,14 @@ impl Minesweeper {
                     continue;
                 }
 
-                let mut bomb_neighbours = 0;
+                let mut bomb_neighbors = 0;
                 foreach_neighbor(x, y, width, height, |nx, ny| {
                     if let CellValue::Bomb = cells[ny][nx].value {
-                        bomb_neighbours += 1;
+                        bomb_neighbors += 1;
                     }
                 });
 
-                cells[y][x].value = CellValue::Num(bomb_neighbours);
+                cells[y][x].value = CellValue::Num(bomb_neighbors);
             }
         }
 
