@@ -14,6 +14,7 @@ const MINE_BOMBS_AMOUNT: u32 = 10;
 pub fn main() -> Result<()> {
     enable_raw_mode()?;
     let mut minesweeper = Minesweeper::new(MINE_WIDTH, MINE_HEIGHT, MINE_BOMBS_AMOUNT);
+    let mut player_lost = false;
 
     let mut cursor_x: usize = 0;
     let mut cursor_y: usize = 0;
@@ -87,16 +88,18 @@ pub fn main() -> Result<()> {
             Event::Key(KeyEvent { code: KeyCode::Down, .. }) if cursor_y < minesweeper.height() - 1 => cursor_y += 1,
             Event::Key(KeyEvent { code: KeyCode::Char('r'), .. }) => {
                 minesweeper = Minesweeper::new(MINE_WIDTH, MINE_HEIGHT, MINE_BOMBS_AMOUNT);
+                player_lost = false;
             }
-            Event::Key(KeyEvent { code: KeyCode::Enter, .. }) => {
+            Event::Key(KeyEvent { code: KeyCode::Enter, .. }) if !player_lost => {
                 if let CellValue::Bomb = minesweeper.get_cell(cursor_x, cursor_y).value() {
                     minesweeper.make_bombs_visible();
+                    player_lost = true;
                 }
                 else {
                     minesweeper.make_cell_visible(cursor_x, cursor_y);
                 }
             }
-            Event::Key(KeyEvent { code: KeyCode::Char(' '), .. }) => {
+            Event::Key(KeyEvent { code: KeyCode::Char(' '), .. }) if !player_lost => {
                 minesweeper.toggle_flag_in_cell(cursor_x, cursor_y);
             }
             _ => {}

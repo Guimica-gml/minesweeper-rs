@@ -77,6 +77,7 @@ pub fn main() -> Result<(), String> {
 
     let mut event_pump = sdl_context.event_pump()?;
     let mut minesweeper = Minesweeper::new(MINE_WIDTH, MINE_HEIGHT, MINE_BOMBS_AMOUNT);
+    let mut player_lost = false;
 
     let field_width: u32 = WINDOW_WIDTH / minesweeper.width() as u32;
     let field_height: u32 = WINDOW_HEIGHT / minesweeper.height() as u32;
@@ -93,15 +94,17 @@ pub fn main() -> Result<(), String> {
             match event {
                 Event::Quit { .. } => break 'gameloop,
                 Event::KeyDown { keycode: Some(Keycode::R), .. } => {
+                    player_lost = false;
                     minesweeper = Minesweeper::new(MINE_WIDTH, MINE_HEIGHT, MINE_BOMBS_AMOUNT);
                 }
-                Event::MouseButtonDown { mouse_btn, x, y, .. } => {
+                Event::MouseButtonDown { mouse_btn, x, y, .. } if !player_lost => {
                     let x = x as usize / field_width as usize;
                     let y = y as usize / field_height as usize;
 
                     if mouse_btn == MouseButton::Left {
                         if let CellValue::Bomb = minesweeper.get_cell(x, y).value() {
                             minesweeper.make_bombs_visible();
+                            player_lost = true;
                         }
                         else {
                             minesweeper.make_cell_visible(x, y);
