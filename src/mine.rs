@@ -8,16 +8,12 @@ pub enum CellValue {
 
 #[derive(Debug, Clone)]
 pub struct Cell {
-    value: CellValue,
-    visible: bool,
-    has_flag: bool,
+    pub value: CellValue,
+    pub visible: bool,
+    pub has_flag: bool,
 }
 
 impl Cell {
-    pub fn value(&self) -> &CellValue { &self.value }
-    pub fn visible(&self) -> bool { self.visible }
-    pub fn has_flag(&self) -> bool { self.has_flag }
-
     fn new(num: i32) -> Self {
         Self {
             value: CellValue::Num(num),

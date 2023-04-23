@@ -102,7 +102,7 @@ pub fn main() -> Result<(), String> {
                     let y = y as usize / field_height as usize;
 
                     if mouse_btn == MouseButton::Left {
-                        if let CellValue::Bomb = minesweeper.get_cell(x, y).value() {
+                        if let CellValue::Bomb = minesweeper.get_cell(x, y).value {
                             minesweeper.make_bombs_visible();
                             player_lost = true;
                         }
@@ -126,12 +126,12 @@ pub fn main() -> Result<(), String> {
                 let posx = (x as u32 * field_width + field_width / 2) as i32;
                 let posy = (y as u32 * field_height + field_height / 2) as i32;
 
-                if minesweeper.get_cell(x, y).has_flag() {
+                if minesweeper.get_cell(x, y).has_flag {
                     let img_size = (u32::min(field_height, field_width) as f32 * 0.7) as i32;
                     let target = rect!(posx - img_size / 2, posy - img_size / 2, img_size, img_size);
                     canvas.copy(&flag_texture, None, Some(target))?;
                 }
-                else if minesweeper.get_cell(x, y).visible() {
+                else if minesweeper.get_cell(x, y).visible {
                     canvas.set_draw_color(Color::RGB(50, 50, 50));
                     let background = rect!(
                         posx - field_width as i32 / 2,
@@ -142,13 +142,13 @@ pub fn main() -> Result<(), String> {
                     canvas.fill_rect(background)?;
                     canvas.set_draw_color(Color::WHITE);
 
-                    match minesweeper.get_cell(x, y).value() {
+                    match minesweeper.get_cell(x, y).value {
                         CellValue::Bomb => {
                             let img_size = (u32::min(field_height, field_width) as f32 * 0.7) as i32;
                             let target = rect!(posx - img_size / 2, posy - img_size / 2, img_size, img_size);
                             canvas.copy(&bomb_texture, None, Some(target))?;
                         }
-                        CellValue::Num(num) if *num != 0 => {
+                        CellValue::Num(num) if num != 0 => {
                             draw_text(&mut canvas, &texture_creator, &font, &num.to_string(), (posx, posy))?;
                         }
                         _ => {}

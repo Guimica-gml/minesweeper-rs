@@ -43,12 +43,12 @@ pub fn main() -> Result<()> {
                     bg_color = Color::Reset;
                 }
 
-                if minesweeper.get_cell(x, y).has_flag() {
+                if minesweeper.get_cell(x, y).has_flag {
                     fg_color = Color::DarkBlue;
                     char = 'F';
                 }
-                else if minesweeper.get_cell(x, y).visible() {
-                    char = match minesweeper.get_cell(x, y).value() {
+                else if minesweeper.get_cell(x, y).visible {
+                    char = match minesweeper.get_cell(x, y).value {
                         CellValue::Bomb => {
                             fg_color = Color::Red;
                             'B'
@@ -91,7 +91,7 @@ pub fn main() -> Result<()> {
                 player_lost = false;
             }
             Event::Key(KeyEvent { code: KeyCode::Enter, .. }) if !player_lost => {
-                if let CellValue::Bomb = minesweeper.get_cell(cursor_x, cursor_y).value() {
+                if let CellValue::Bomb = minesweeper.get_cell(cursor_x, cursor_y).value {
                     minesweeper.make_bombs_visible();
                     player_lost = true;
                 }
